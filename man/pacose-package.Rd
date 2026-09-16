@@ -49,7 +49,7 @@ Authors:
 }
 
 
-Vincent Guillemot \email{vincent.guillemot@pasteur.fr}, Andreas Bender.
+Vincent Guillemot \email{contact@vincentguillemot.fr}, Andreas Bender.
 }
 \keyword{internal}
 \keyword{package}

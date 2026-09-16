@@ -27,7 +27,7 @@
 #' The functions \code{mylars}, \code{adalasso} and \code{ridge.cv} are internal local-regression helpers. The public PACOSE wrappers expose the corresponding estimation methods.
 #'
 #' @author
-#' Vincent Guillemot \email{vincent.guillemot@pasteur.fr}, Andreas Bender.
+#' Vincent Guillemot \email{contact@vincentguillemot.fr}, Andreas Bender.
 #'
 #' @references
 #' [1] Guillemot V., Bender A., Boulesteix A.-L. (2012). Iterative reconstruction of high-dimensional Gaussian graphical models based on a new method to estimate partial correlations under constraints. Submitted.
