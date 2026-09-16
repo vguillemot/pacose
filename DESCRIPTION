@@ -25,7 +25,7 @@ Suggests:
   mvtnorm,
   testthat (>= 3.0.0)
 Remotes:
-    vguillemot/ppls
+    vguillemot/ppls,
     vguillemot/lcd
 URL: https://github.com/vguillemot/pacose,
   https://doi.org/10.1371/journal.pone.0060536
