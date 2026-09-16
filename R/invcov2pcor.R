@@ -8,6 +8,7 @@
 #' @return The corresponding partial correlation matrix.
 #' @references Whittaker, J. (1990). *Graphical models in applied multivariate statistics*. Wiley.
 #' @keywords algebra multivariate
+#' @export
 
 invcov2pcor <- function(mat) cov2cor(oppdiag(mat))
 

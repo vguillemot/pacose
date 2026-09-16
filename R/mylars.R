@@ -13,7 +13,7 @@ mylars <- function (X, y, k = 10, use.Gram = TRUE, normalize = TRUE)
                       type.gaussian = type)
   lambda <- globalfit$lambda
   residmat <- matrix(0, length(lambda), k)
-  for (i in seq(k)) {
+  for (i in seq_len(k)) {
     omit <- all.folds[[i]]
     fit <- glmnet(x[-omit, , drop = FALSE], y[-omit], type.gaussian = type, 
                   standardize = normalize, family = "gaussian")
@@ -21,11 +21,10 @@ mylars <- function (X, y, k = 10, use.Gram = TRUE, normalize = TRUE)
                    s = lambda)
     if (length(omit) == 1) 
       fit <- matrix(fit, nrow = 1)
-    residmat[, i] <- apply((y[omit] - fit)^2, 2, mean)
+    residmat[, i] <- colMeans((y[omit] - fit)^2)
   }
-  cv <- apply(residmat, 1, mean)
+  cv <- rowMeans(residmat)
   cv.lasso <- min(cv)
-  cv.error <- sqrt(apply(residmat, 1, var)/k)
   lambda.opt <- lambda[which.min(cv)]
   coefficients = predict(globalfit, type = "coefficients", 
                          s = lambda.opt)

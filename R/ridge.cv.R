@@ -1,7 +1,7 @@
-ridge.cv <- function (X, y, lambda = NULL, scale = TRUE, k = 10, plot.it = FALSE) 
+ridge.cv <- function (X, y, lambda = NULL, scale = TRUE, k = 10, plot.it = FALSE, nlambda = 100) 
 {
     if (is.null(lambda) == TRUE) {
-        ss <- seq(-10, -1, length = 1000)
+        ss <- seq(-10, -1, length = nlambda)
         ss <- 10^ss
         n <- nrow(X)
         nn <- n - floor(n/k)
@@ -9,8 +9,8 @@ ridge.cv <- function (X, y, lambda = NULL, scale = TRUE, k = 10, plot.it = FALSE
     }
     cv <- rep(0, length(lambda))
     n <- nrow(X)
-    all.folds <- split(sample(1:n), rep(1:k, length = n))
-    for (i in seq(k)) {
+    all.folds <- split(sample(seq_len(n)), rep(seq_len(k), length = n))
+    for (i in seq_len(k)) {
         omit <- all.folds[[i]]
         Xtrain = X[-omit, , drop = FALSE]
         ytrain = y[-omit]
@@ -18,11 +18,9 @@ ridge.cv <- function (X, y, lambda = NULL, scale = TRUE, k = 10, plot.it = FALSE
         ytest = y[omit]
         ll <- lm.ridge(ytrain ~ Xtrain, scale = scale, lambda = lambda)
         coef.ll <- coef(ll)
-        res <- matrix(, length(ytest), length(lambda))
         pred <- t(matrix(coef.ll[, 1], nrow = length(lambda), 
             ncol = length(ytest))) + Xtest %*% t(coef.ll[, -1])
-        res <- pred - matrix(ytest, nrow = length(ytest), ncol = length(lambda))
-        cv <- cv + apply(res^2, 2, sum)
+        cv <- cv + colSums((pred - ytest)^2)
     }
     cv <- cv/n
     lambda.opt <- lambda[which.min(cv)]

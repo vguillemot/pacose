@@ -10,13 +10,14 @@
 #' @return Boolean: TRUE if the (sub)graph is complete, FALSE if not.
 #'
 #' @keywords graphs
+#' @export
 
 
 isComplete <- function (G, set){
  if (length(set)<=1) {
    Res <- TRUE
  } else {
-   B       <- as(G, "matrix")
+  B       <- igraph::as_adjacency_matrix(G, sparse = FALSE)
    B       <- B[set,set]
    diag(B) <- 1
    Res     <- all(B != 0)

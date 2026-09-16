@@ -10,7 +10,7 @@
 #' @param cutoff a threshold to apply to the new partial correlation matrices obtained with PACOSE in order to obtain a new version of the graph.
 #' @param gr the true graph (an object of class [igraph::igraph]) when it is known. It must be set to NULL (the default value) when the true graph is not known.
 #' @param k integer, the number of folds to be used when selecting the optimal value for the regularization parameter.
-#' @param cv.method Only valid when the reference method is [ridge.net]: determines the way the ridge parameter is computed ("HKB" or "CV", see \code{pacose.ridge}).
+#' @param cv.method Determines the way the ridge parameter is computed ("HKB" or "CV", see \code{pacose.ridge}).
 #' @param adaptive boolean, default to FALSE.
 #'
 #' @return A list with the following components:
@@ -40,9 +40,9 @@
 #' gr <- graph.adjacency((omega != 0), mode = "undirected", diag = FALSE)
 #' x <- rmvnorm(n = 100, sigma = solve(omega))
 #'
-#' # First estimation with ridge.net, the threshold is, for this toy example,
+#' # First estimation with pacose.ridge, the threshold is, for this toy example,
 #' # arbitrarily set to 0.05
-#' pcor0.0 <- ridge.net(x)$pcor
+#' pcor0.0 <- pacose.ridge(x, gr, cv.method = "HKB")$pcor
 #' pcor0 <- (abs(pcor0.0) > 0.05) + 0
 #'
 #' # Use iPACOSE to estimate iteratively the partial correlation matrix
@@ -54,6 +54,7 @@
 #' pcor1$pcor_it
 #'
 #' @keywords algebra multivariate
+#' @export
 
 ipacose <- function(x=x,pc=pc,method="pacose.ridge",cutoff,gr=NULL,k=2, cv.method="CV",adaptive=FALSE) {
   nonstop <- TRUE

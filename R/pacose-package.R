@@ -1,11 +1,18 @@
 #' @keywords internal
+#' @useDynLib pacose
+#' @importFrom corpcor pvar.shrink pseudoinverse
+#' @importFrom glmnet glmnet
+#' @importFrom igraph E graph.adjacency graph.intersection graph.union get.adjacency is.chordal
+#' @importFrom lcd ug.to.jtree
+#' @importFrom MASS lm.ridge
+#' @importFrom ppls penalized.pls.cv
+#' @importFrom stats coef cov cov2cor lm predict var
 "_PACKAGE"
 
 #' PACOSE and iPACOSE implementation plus several other covariance selection methods
 #'
 #' PACOSE is a method able to estimate a partial correlation matrix knowing a pattern of zeros. iPACOSE is an iterative application of PACOSE aiming at estimating a graph from a dataset.
 #'
-#' @docType package
 #' @name pacose-package
 #'
 #' @details
@@ -17,7 +24,7 @@
 #'
 #' iPACOSE is implemented in the function \code{\link{ipacose}}.
 #'
-#' Note that the functions \code{mylars}, \code{adalasso} and \code{ridge.cv} are exactly identical to the ones in package \code{\link[parcor:parcor-package]{parcor}} [5]. They were included directly into the package to avoid a dependency that would interfere with the new function \code{\link{ridge.net}}. The latter is basically the same as the one in \code{\link[parcor:parcor-package]{parcor}}, except for the fact that the determination of the Ridge parameter can be done either analytically or with k-fold cross validation in this new function.
+#' The functions \code{mylars}, \code{adalasso} and \code{ridge.cv} are internal local-regression helpers. The public PACOSE wrappers expose the corresponding estimation methods.
 #'
 #' @author
 #' Vincent Guillemot \email{vincent.guillemot@pasteur.fr}, Andreas Bender.
@@ -33,9 +40,9 @@
 #'
 #' [5] Kraemer, N., Schaefer, J., and Boulesteix, A.-L. (2009). Regularized estimation of large scale gene association networks using gaussian graphical models. BMC Bioinformatics, 10:384.
 #'
-#' @keyword package
+#' @keywords package
 #'
-#' @seealso The functions presented in this package are strongly inspired from the functions in \code{\link[parcor:parcor-package]{parcor}}.
+#' @seealso The public estimation functions are \code{\link{pacose.ridge}}, \code{\link{pacose.pls}} and \code{\link{pacose.adalasso}}.
 #'
 #' @examples
 #' # For further examples on simulated and real datasets, see the associated

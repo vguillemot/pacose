@@ -2,7 +2,7 @@
 #'
 #' The function takes as an argument a dataset and a graph and returns an estimation of the partial correlation matrix.
 #'
-#' @usage pacose.pls(X, gg, scale = TRUE, k = 10, Ncomp = NULL, verbose = FALSE, cv.method = "CV")
+#' @usage pacose.pls(X, gg, scale = TRUE, k = 10, Ncomp = NULL, verbose = FALSE, cv.method = "CV", seed = NULL)
 #'
 #' @param X a dataset (matrix) of dimensions n x p.
 #' @param gg the graph (an object of class \code{\link[igraph:igraph-package]{igraph}}) to integrate.
@@ -10,6 +10,7 @@
 #' @param k integer, the number of folds to be used when selecting the optimal value among \code{Ncomp}.
 #' @param Ncomp integer, the maximal number of PLS components to be used.
 #' @param verbose boolean, whether to print out intermediate messages or not, default to FALSE.
+#' @param seed optional integer used to make cross-validation reproducible.
 #' @param cv.method equals "CV", for a cross validation determination of the regularization parameter. Alternative values are only used in function \code{\link{pacose.ridge}}.
 #'
 #' @return A list containing:
@@ -23,7 +24,7 @@
 #'
 #' @author Vincent Guillemot
 #'
-#' @seealso \code{\link[parcor:pls.net]{pls.net}}, \code{\link{pacose.ridge}}, \code{\link{pacose.adalasso}}
+#' @seealso \code{\link{pacose.ridge}}, \code{\link{pacose.adalasso}}
 #'
 #' @examples
 #' require(mvtnorm)
@@ -44,10 +45,13 @@
 #' round(omega.hat, 3)
 #'
 #' @keywords algebra multivariate
+#' @export
 
-pacose.pls <- function(X, gg, scale = TRUE, k = 10, Ncomp = NULL, verbose = FALSE, cv.method="CV") {
+pacose.pls <- function(X, gg, scale = TRUE, k = 10, Ncomp = NULL, verbose = FALSE, cv.method="CV", seed = NULL) {
+    if (!is.null(seed)) set.seed(seed)
     n <- nrow(X)
     p <- ncol(X)
+    X <- scale(X, scale = scale)
     pv <- pvar.shrink(X,verbose=F)
     k <- max(1,floor(k))
     if (k > n) {
@@ -71,7 +75,6 @@ pacose.pls <- function(X, gg, scale = TRUE, k = 10, Ncomp = NULL, verbose = FALS
         yi <- X[, i]
         if(length(noti)==0) { #pv[i] <- var(yi)
         } else {
-          Xi <- matrix(X[, noti],ncol=length(noti))
           Xi <- X[, noti]
           if (!is.null(dim(Xi))) {
               if (is.null(Ncomp)) {
@@ -79,7 +82,7 @@ pacose.pls <- function(X, gg, scale = TRUE, k = 10, Ncomp = NULL, verbose = FALS
               } else {
                      ncomp <- Ncomp
               }
-              fit <- penalized.pls.cv(Xi, yi, scale = scale, k = k, ncomp = ncomp)
+              fit <- penalized.pls.cv(Xi, yi, scale = FALSE, k = k, ncomp = ncomp)
               B[i, noti] <- fit$coefficients
               m[i] <- fit$ncomp.opt
           } else {

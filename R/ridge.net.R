@@ -1,9 +1,9 @@
 ridge.net <-
 function (X, lambda = NULL, plot.it = FALSE, scale = TRUE, k = 10,
-    verbose = FALSE, cv.method="HKB")
+    verbose = FALSE, cv.method="HKB", nlambda = 100)
 {
     if (is.null(lambda) == TRUE) {
-        ss <- seq(-10, -1, length = 1000)
+        ss <- seq(-10, -1, length = nlambda)
         ss <- 10^ss
         n <- nrow(X)
         nn <- n - floor(n/k)

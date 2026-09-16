@@ -34,6 +34,7 @@
 #' round(omega.hat, 3)
 #'
 #' @keywords algebra multivariate
+#' @export
 
 omegaSURE <- function(x, gr) {
   if (!(is.chordal(gr,fillin=TRUE)$chordal)) {warning("Non decomposable graph");return(matrix(NaN,ncol(x),ncol(x)))}

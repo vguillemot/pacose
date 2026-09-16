@@ -2,7 +2,7 @@
 #'
 #' The function takes as an argument a dataset and a graph and returns an estimation of the partial correlation matrix.
 #'
-#' @usage pacose.ridge(X, gg, lambda = NULL, scale = FALSE, k = 10, verbose = FALSE, cv.method = "CV")
+#' @usage pacose.ridge(X, gg, lambda = NULL, scale = FALSE, k = 10, verbose = FALSE, cv.method = "CV", seed = NULL, nlambda = 100)
 #'
 #' @param X a dataset (matrix) of dimensions n x p.
 #' @param gg the graph (an object of class \code{\link[igraph:igraph-package]{igraph}}) to integrate.
@@ -11,6 +11,8 @@
 #' @param k integer, the number of folds to be used when selecting the optimal value among \code{lambda}.
 #' @param verbose boolean, whether to print out intermediate messages or not, default to FALSE.
 #' @param cv.method determines the way the ridge parameter is computed: should be equal to either "HKB" for an analytical determination, or "CV", for a cross validation alternative. When equal to "HKB", neither \code{lambda} nor \code{k} are used.
+#' @param seed optional integer used to make cross-validation reproducible.
+#' @param nlambda number of candidate ridge parameters when \code{lambda} is NULL.
 #'
 #' @return A list containing:
 #' \describe{
@@ -22,7 +24,7 @@
 #'
 #' @author Vincent Guillemot
 #'
-#' @seealso \code{\link[parcor:ridge.net]{ridge.net}}, \code{\link{pacose.pls}}, \code{\link{pacose.adalasso}}
+#' @seealso \code{\link{pacose.pls}}, \code{\link{pacose.adalasso}}
 #'
 #' @examples
 #' require(mvtnorm)
@@ -43,10 +45,12 @@
 #' round(omega.hat, 3)
 #'
 #' @keywords algebra multivariate
+#' @export
 
-pacose.ridge <- function(X, gg, lambda = NULL, scale = FALSE, k = 10, verbose = FALSE, cv.method="CV") {
+pacose.ridge <- function(X, gg, lambda = NULL, scale = FALSE, k = 10, verbose = FALSE, cv.method="CV", seed = NULL, nlambda = 100) {
+    if (!is.null(seed)) set.seed(seed)
     if (is.null(lambda) == TRUE) {
-        ss <- seq(-10, -1, length = 1000)
+        ss <- seq(-10, -1, length = nlambda)
         ss <- 10^ss
         n <- nrow(X)
         nn <- n - floor(n/k)
@@ -54,8 +58,8 @@ pacose.ridge <- function(X, gg, lambda = NULL, scale = FALSE, k = 10, verbose = 
     }
     n <- nrow(X)
     p <- ncol(X)
-    pv <- pvar.shrink(X,verbose=F)
     X <- scale(X, scale = scale)
+    pv <- pvar.shrink(X,verbose=F)
     A <- get.adjacency(gg)
     B <- matrix(0, nrow = p, ncol = p)
     lambda.opt <- rep(0, p)
@@ -71,13 +75,12 @@ pacose.ridge <- function(X, gg, lambda = NULL, scale = FALSE, k = 10, verbose = 
         if(length(noti)==0) { #pv[i] <- var(yi)
         } else {
 
-          Xi <- matrix(X[, noti],ncol=length(noti))
           Xi <- X[, noti]
           if (!is.null(dim(Xi))) {
-              if (cv.method == "CV" ) lambda.opt.i <- ridge.cv(Xi, yi, lambda = lambda, scale = scale, plot.it = FALSE, k = k)$lambda.opt
-              if (cv.method == "HKB") lambda.opt.i <- lm.ridge(yi~Xi, lambda = 0, scale = scale)$kHKB
+              if (cv.method == "CV" ) lambda.opt.i <- ridge.cv(Xi, yi, lambda = lambda, scale = FALSE, plot.it = FALSE, k = k)$lambda.opt
+              if (cv.method == "HKB") lambda.opt.i <- lm.ridge(yi~Xi, lambda = 0, scale = FALSE)$kHKB
 
-              rr <- lm.ridge(yi ~ Xi, scale = scale, lambda = lambda.opt.i)
+              rr <- lm.ridge(yi ~ Xi, scale = FALSE, lambda = lambda.opt.i)
 
               B[i, noti ] <- coef(rr)[-1]
               lambda.opt[i] <- lambda.opt.i

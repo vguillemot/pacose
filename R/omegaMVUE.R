@@ -34,6 +34,7 @@
 #' round(omega.hat, 3)
 #'
 #' @keywords algebra multivariate
+#' @export
 
 
 omegaMVUE <- function(x, gr) {

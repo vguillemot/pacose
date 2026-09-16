@@ -1,0 +1,15 @@
+bibentry(
+  bibtype = "Article",
+  title = "Iterative Reconstruction of High-Dimensional Gaussian Graphical Models Based on a New Method to Estimate Partial Correlations under Constraints",
+  author = c(
+    person("Vincent", "Guillemot"),
+    person("Andreas", "Bender"),
+    person("Anne-Laure", "Boulesteix")
+  ),
+  journal = "PLOS ONE",
+  year = "2013",
+  volume = "8",
+  number = "4",
+  pages = "e60536",
+  doi = "10.1371/journal.pone.0060536"
+)

@@ -49,10 +49,10 @@ adalasso <- function (X, y, k = 10, use.Gram = TRUE, both = TRUE)
         if (length(omit) == 1) {
           pred <- matrix(pred, nrow = 1)
         }
-        residmat[, i] <- apply((ytest - pred)^2, 2, mean)
+        residmat[, i] <- colMeans((ytest - pred)^2)
       }
     }
-    cv <- apply(residmat, 1, mean)
+    cv <- rowMeans(residmat)
     cv.adalasso <- min(cv)
     weights <- 1/abs(coefficients.lasso[abs(coefficients.lasso) > 
       0])

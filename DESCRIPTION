@@ -1,24 +1,34 @@
 Package: pacose
 Type: Package
-Version: 2.1.0
+Version: 3.0.0
 Title: iPACOSE, PACOSE and other methods for covariance selection
-Description: Implementation of iPACOSE, PACOSE and of various methods
-        for the estimation of covariance/precision matrices under the
-        constraint that some partial correlation coefficients are equal
-        to zero.
+Description: Estimation of partial correlation and precision matrices under
+  graph-based conditional independence constraints. The package provides
+  Ridge, PLS, LASSO, adaptive LASSO, iPACOSE, MVUE, SURE and INVEST methods.
 Authors@R: c(
     person(
       "Vincent", "Guillemot",
-      email = "vincent.guillemot@pasteur.fr",
+      email = "contact@vincentguillemot.fr",
       role = c("aut", "cre")
     ),
-    person("Andreas", "Bender")
+    person("Andreas", "Bender", role = "aut")
   )
-Depends: ggm, igraph, MASS, corpcor, glmnet, mvtnorm, lcd
 Imports:
-    ppls (>= 1.0.0)
+    corpcor,
+    glmnet,
+    igraph,
+    lcd,
+    MASS,
+    ppls (>= 1.0.0),
+    stats
+Suggests:
+  mvtnorm,
+  testthat (>= 3.0.0)
 Remotes:
     vguillemot/ppls
+    vguillemot/lcd
+URL: https://github.com/vguillemot/pacose,
+  https://doi.org/10.1371/journal.pone.0060536
 Encoding: UTF-8
 License: GPL
-RoxygenNote: 7.3.2
+Config/roxygen2/version: 8.1.0

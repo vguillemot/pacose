@@ -2,14 +2,15 @@
 #'
 #' The function takes as an argument a dataset and a graph and returns an estimation of the partial correlation matrix.
 #'
-#' @usage pacose.adalasso(X, gg, k = 10, use.Gram = FALSE, both = TRUE, verbose = FALSE, cv.method = "CV")
+#' @usage pacose.adalasso(X, gg, k = 10, use.Gram = FALSE, both = TRUE, verbose = FALSE, cv.method = "CV", seed = NULL)
 #'
 #' @param X a dataset (matrix) of dimensions n x p.
 #' @param gg the graph (an object of class \code{\link[igraph:igraph-package]{igraph}}) to integrate.
 #' @param k integer, the number of folds to be used when selecting the optimal value of the regularization parameter.
-#' @param use.Gram see \code{\link[parcor:adalasso]{adalasso}}.
+#' @param use.Gram whether the underlying LASSO fit should use the Gram matrix.
 #' @param both boolean, whether to compute both the adaptive LASSO and the non adaptive LASSO versions of the partial correlation matrix or not, default to TRUE.
 #' @param verbose boolean, whether to print out intermediate messages or not, default to FALSE.
+#' @param seed optional integer used to make cross-validation reproducible.
 #' @param cv.method equals "CV", for a cross validation determination of the regularization parameter. Alternative values are only used in function \code{\link{pacose.ridge}}.
 #'
 #' @return A list containing:
@@ -24,7 +25,7 @@
 #'
 #' @author Vincent Guillemot
 #'
-#' @seealso \code{\link[parcor:adalasso.net]{adalasso.net}}, \code{\link{pacose.ridge}}, \code{\link{pacose.pls}}
+#' @seealso \code{\link{pacose.ridge}}, \code{\link{pacose.pls}}
 #'
 #' @examples
 #' \dontrun{
@@ -47,9 +48,11 @@
 #' }
 #'
 #' @keywords algebra multivariate
+#' @export
 
 
-pacose.adalasso <- function (X, gg, k = 10, use.Gram = FALSE, both = TRUE, verbose = FALSE, cv.method="CV")  {
+pacose.adalasso <- function (X, gg, k = 10, use.Gram = FALSE, both = TRUE, verbose = FALSE, cv.method="CV", seed = NULL)  {
+    if (!is.null(seed)) set.seed(seed)
     p <- ncol(X)
     X <- scale(X)
     colnames(X) <- 1:p

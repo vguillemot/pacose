@@ -1,47 +1,63 @@
 #include <R.h>
-#include <Rmath.h>
+#include <math.h>
+#include <string.h>
 
 void wermuthC(int *p, int *ninteract, double *delta, double *error, int *iter, int *maxiter,
-                    int ind[*ninteract][2], double icovx[*p][*p], double result[*p][*p])
+                      int ind[*ninteract][2], double icovx[*p][*p], double result[*p][*p])
 {
- double sii,sjj,sij,d,errortemp,coef ;
- int i,j,k,l,u,i1,i2 ;
- double temp[*p][*p] ;
- for (i1 = 0; i1 < *p; i1++) for (i2 = 0; i2 < *p; i2++)  temp[i1][i2] = icovx[i1][i2];
+  double sii,sjj,sij,d,inv_sii,inv_sjj,sij_over_d,errortemp,coef ;
+  int i,j,k,l,u ;
+  const int pp = *p ;
+  double temp[pp][pp] ;
+  memcpy(temp, icovx, (size_t)pp * (size_t)pp * sizeof(double));
  while( (*iter < *maxiter) && (*error > *delta) ){
    *iter = *iter+1 ;
    for (u = 0; u < *ninteract; u++) {
-        i = fmin2(ind[u][0],ind[u][1]);
-        j = fmax2(ind[u][0],ind[u][1]);
-        sii = temp[i][i] ;
-        sjj = temp[j][j] ;
-        sij = temp[i][j] ;
+         i = ind[u][0] < ind[u][1] ? ind[u][0] : ind[u][1];
+         j = ind[u][0] < ind[u][1] ? ind[u][1] : ind[u][0];
+         double *temp_i = temp[i] ;
+         double *temp_j = temp[j] ;
+         double *result_i = result[i] ;
+         double *result_j = result[j] ;
+         sii = temp_i[i] ;
+         sjj = temp_j[j] ;
+         sij = temp_i[j] ;
         d   = sii*sjj-sij*sij ;
-        result[i][j] = result[j][i] = 0 ;
-        result[i][i] = d/sjj ;
-        result[j][j] = d/sii ;
-        for (k=0; k < (*p) ; k++) {
+         inv_sii = 1.0 / sii ;
+         inv_sjj = 1.0 / sjj ;
+         sij_over_d = sij / d ;
+        result_i[j] = result_j[i] = 0 ;
+         result_i[i] = d * inv_sjj ;
+         result_j[j] = d * inv_sii ;
+        for (k=0; k < pp ; k++) {
           if (k != i && k != j) {
-            result[k][i] = result[i][k] = temp[i][k] - sij*temp[j][k]/sjj;
-            result[k][j] = result[j][k] = temp[j][k] - sij*temp[i][k]/sii;
-            for (l=0; l < (*p) ; l++) {
-              if (l != i && l != j && l <= k) result[k][l] = result[l][k] = temp[k][l]
-                                                  - (sij/d)*( (temp[i][k])*(temp[j][l] - sij*temp[i][l]/sjj) +
-                                                              (temp[j][k])*(temp[i][l] - sij*temp[j][l]/sjj) ) ;
+            /* hoisted out of the l-loop: constant for the whole row k */
+            double tik = temp_i[k] ;
+            double tjk = temp_j[k] ;
+            double *temp_k = temp[k] ;
+            double *result_k = result[k] ;
+            result_k[i] = result_i[k] = tik - sij*tjk*inv_sjj;
+            result_k[j] = result_j[k] = tjk - sij*tik*inv_sii;
+            for (l=0; l <= k ; l++) {
+              if (l != i && l != j) {
+                double value = temp_k[l] - sij_over_d * ( tik*(temp_j[l] - sij*temp_i[l]*inv_sjj) +
+                                                           tjk*(temp_i[l] - sij*temp_j[l]*inv_sjj) ) ;
+                result_k[l] = value ;
+                result[l][k] = value ;
+              }
             }
           }
         }
-   for (i1 = 0; i1 < *p; i1++) for (i2 = 0; i2 < *p; i2++) temp[i1][i2] = result[i1][i2];
+  memcpy(temp, result, (size_t)pp * (size_t)pp * sizeof(double));
    }
    errortemp = 0;
    for (u = 0; u < *ninteract; u++) {
-     i = ind[u][0] ;
-     j = ind[u][1] ;
-     coef =  fmax2(-result[i][j],result[i][j]) ;
-     //printf ("Coef: %d , %d , %f \n", i,j,coef);
+    i = ind[u][0] ;
+    j = ind[u][1] ;
+    coef = fabs(result[i][j]) ;
      if (coef > errortemp) errortemp = coef;
    }
-   *error = errortemp ;
+  *error = errortemp ;
  }
 }
 
